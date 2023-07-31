@@ -1,7 +1,12 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
+
+
 #[ink::contract]
 mod task_list {
+    
+    use ink::prelude::vec::Vec;
+    use ink::prelude::string::String;
 
     #[derive(Debug, Clone, scale::Encode, scale::Decode, PartialEq)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
@@ -16,10 +21,7 @@ mod task_list {
     }
 
     impl Task {
-        #[ink(constructor)]
-        pub fn new() -> Self {
-            Self { list: Vec::new() }
-        }
+        
 
         #[ink(constructor)]
         pub fn default() -> Self {
