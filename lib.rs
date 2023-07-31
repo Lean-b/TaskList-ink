@@ -43,7 +43,7 @@ mod task_list {
         #[ink(message)]
         pub fn delete_task(&mut self, index: u32) {
             let index_usize: usize = index as usize;
-            self.list.swap_remove(index_usize);
+            self.list.remove(index_usize);
         }
 
         #[ink(message)]
@@ -61,13 +61,12 @@ mod task_list {
 
 #[cfg(test)]
 mod tests {
-    use crate::task_list::Task;
+    use crate::task_list::{Task, TaskList};
 
     #[test]
     fn test_add() {
-        // Prueba con título y descripción cortos
         {
-            println!("Ejecutando prueba con título y descripción cortos");
+            println!("");
             let mut task = Task::default();
 
             task.add("Test".to_owned(), "Short description".to_owned());
@@ -78,9 +77,8 @@ mod tests {
             assert_eq!(get_tasks.as_ref().unwrap().description, "Short description");
         }
 
-        // Prueba con título y descripción largos
         {
-            println!("Prueba con título y descripción largos");
+            println!("");
             let mut task = Task::default();
 
             task.add(
@@ -98,9 +96,8 @@ mod tests {
             );
         }
 
-        // Prueba de tarea duplicada
         {
-            println!("Prueba con título y descripción largos duplicados");
+            println!("");
             let mut task = Task::default();
 
             task.add(
@@ -119,12 +116,10 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_get_task() {
-        // Prueba con una tarea agregada previamente
         {
-            println!("Ejecutando prueba con la tarea agregada");
+            println!("");
             let mut task = Task::default();
 
             task.add("Test".to_owned(), "Short description".to_owned());
@@ -137,9 +132,8 @@ mod tests {
             println!("Task: {:?}", get_tasks);
         }
 
-        // Prueba con una lista vacia
         {
-            println!("Ejecutando prueba con lista vacia");
+            println!("");
             let task = Task::default();
 
             let get_tasks = task.get_task(0);
@@ -149,9 +143,8 @@ mod tests {
             println!("Task: {:?}", get_tasks);
         }
 
-        // Prueba con un indice fuera del rango del vector
         {
-            println!("Ejecutando prueba con un indice fuera del rango del vector");
+            println!("");
             let mut task = Task::default();
 
             task.add("Test".to_owned(), "test".to_owned());
@@ -164,12 +157,9 @@ mod tests {
         }
     }
 
-
-
     #[test]
     fn test_get_list() {
-        // Prueba de la lista de tarea
-        println!("Ejecutando prueba para mostrar la lista de tarea");
+        println!("");
         let mut task = Task::default();
 
         println!();
@@ -186,25 +176,74 @@ mod tests {
 
         assert_eq!(get_task_lists[0].title, "Test");
         assert_eq!(get_task_lists[0].description, "test1");
-    
+
         assert_eq!(get_task_lists[1].title, "Test");
         assert_eq!(get_task_lists[1].description, "test2");
-    
+
         assert_eq!(get_task_lists[2].title, "Test");
         assert_eq!(get_task_lists[2].description, "test3");
 
         println!("Task list: {:?}", get_task_lists);
     }
 
-
     #[test]
     fn test_update_task() {
-
-        println!("Ejecutando prueba de actualizacion de tarea");
+        println!("");
+        let mut task = Task::default();
+    
+        task.add("Test".to_owned(), "test".to_owned());
+    
+        let get_task = task.get_task(0);
+        println!("Task One: {:?}", get_task);
+    
+        let task_before = get_task.clone();
+    
+        task.update_task(0, "test".to_owned(), "task updated".to_owned());
+    
+        let get_task_updated = task.get_task(0);
+        println!("Task One: {:?}", get_task);
+    
+        assert_eq!(get_task, task_before);
+        assert_eq!(
+            get_task,
+            Some(TaskList {
+                title: "Test".to_owned(),
+                description: "test".to_owned()
+            })
+        );
+        assert_eq!(
+            get_task_updated,
+            Some(TaskList {
+                title: "test".to_owned(),
+                description: "task updated".to_owned()
+            })
+        );
+    }
+    
+    #[test]
+    fn test_delete_task() {
+        println!("");
         let mut task = Task::default();
 
-        task.add("Test".to_owned(), "test".to_owned());
-        
-    }
+        task.add("test deleted".to_owned(), "test deleted".to_owned());
 
+        let task_index_before = task.get_task(0);
+        println!("Task Before: {:?}", task_index_before);
+
+        let deleted_task = task.delete_task(0);
+
+        println!("Task deleted: {:?}", deleted_task);
+
+        let task_index_after = task.get_task(0);
+        println!("Task After: {:?}", task_index_after);
+
+        assert_eq!(
+            task_index_before,
+            Some(TaskList {
+                title: "test deleted".to_owned(),
+                description: "test deleted".to_owned()
+            })
+        );
+        assert_eq!(task_index_after, None);
+    }
 }
